@@ -66,7 +66,7 @@ function selectAndSend() {
         console.log(rows);
         var options = {
             headers: {"Connection": "close"},
-            url: 'http://127.0.0.1:3000/douyu',
+            url: 'http://121.42.136.52:2999/douyu',
             method: 'POST',
             json: true,
             body: {data:rows}
