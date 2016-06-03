@@ -10,11 +10,11 @@ var conn = mysql.createConnection({
     database: 'douyu',
     port: 3306
 });
-var page=0;
+var page = 0;
 var EventEmitter = require('events').EventEmitter;
 var myEvents = new EventEmitter();
 var router = express.Router();
-
+var isFinish = false;
 /* GET home page. */
 router.get('/', function (req, res, next) {
     res.render('index', {title: 'Express'});
@@ -22,9 +22,9 @@ router.get('/', function (req, res, next) {
 router.get('/sendjson', function (req, res, next) {
     //防止多次提交
 
-    if(page==0){
+    if (page == 0) {
         sub();
-    }else {
+    } else {
         return res.json({err: '正在传输数据中...'})
 
     }
@@ -33,7 +33,7 @@ router.get('/sendjson', function (req, res, next) {
 });
 
 myEvents.on('douyu', function () {
-    var times=[];
+    var times = [];
     for (var i = 0; i < 60; i = i + 5) {
         times.push(i);
     }
@@ -47,29 +47,34 @@ myEvents.on('douyu', function () {
 // });
     rule.second = times;
     schedule.scheduleJob(rule, function () {
-        if (page<42){
-            selectAndSend();
-        }else {
-            page=0;
+        if (isFinish) {
+            page = 0;
+            isFinish = false;
             this.cancel();
+        } else {
+            selectAndSend();
         }
     });
 });
 
 
 function selectAndSend() {
-    var selectSql='SELECT * FROM dy ORDER BY id desc limit ' +parseInt(page)*100+ ', 100;';
-    conn.query(selectSql,function (err,rows,fields) {
-        if (err){
+    var selectSql = 'SELECT * FROM blibli ORDER BY id desc limit ' + parseInt(page) * 100 + ', 100;';
+    conn.query(selectSql, function (err, rows, fields) {
+        if (err) {
             return console.log(err)
         }
         console.log(rows);
+        if (rows.length == 0) {
+            isFinish = true;
+            return;
+        }
         var options = {
             headers: {"Connection": "close"},
-            url: 'http://121.42.136.52:2999/douyu',
+            url: 'http://121.42.136.52:2999/bilibli',
             method: 'POST',
             json: true,
-            body: {data:rows}
+            body: {data: rows}
         };
 
         function callback(error, response, data) {
@@ -83,17 +88,17 @@ function selectAndSend() {
     });
     page++;
 };
-var mypretime=0;
-function sub(){
+var mypretime = 0;
+function sub() {
     var Today = new Date();
     var NowHour = Today.getHours();
     var NowMinute = Today.getMinutes();
     var NowSecond = Today.getSeconds();
-    var mysec = (NowHour*3600)+(NowMinute*60)+NowSecond;
-    if((mysec-mypretime)>10){
+    var mysec = (NowHour * 3600) + (NowMinute * 60) + NowSecond;
+    if ((mysec - mypretime) > 10) {
 //10只是一个时间值，就是10秒内禁止重复提交，值随便设
-        mypretime=mysec;
-    }else{
+        mypretime = mysec;
+    } else {
         return;
     }
     myEvents.emit('douyu');
