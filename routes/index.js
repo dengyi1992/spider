@@ -59,7 +59,7 @@ myEvents.on('douyu', function () {
 
 
 function selectAndSend() {
-    var selectSql = 'SELECT * FROM panda ORDER BY id desc limit ' + parseInt(page) * 100 + ', 100;';
+    var selectSql = 'SELECT * FROM douyu ORDER BY id desc limit ' + parseInt(page) * 100 + ', 100;';
     conn.query(selectSql, function (err, rows, fields) {
         if (err) {
             return console.log(err)
@@ -71,7 +71,7 @@ function selectAndSend() {
         }
         var options = {
             headers: {"Connection": "close"},
-            url: 'http://120.27.94.166:2999/panda',
+            url: 'http://120.27.94.166:2999/douyu',
             method: 'POST',
             json: true,
             body: {data: rows}
