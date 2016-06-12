@@ -6,7 +6,7 @@ var rule = new schedule.RecurrenceRule();
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'dengyi',
+    password: 'root',
     database: 'douyu',
     port: 3306
 });
@@ -59,7 +59,7 @@ myEvents.on('douyu', function () {
 
 
 function selectAndSend() {
-    var selectSql = 'SELECT * FROM blibli ORDER BY id desc limit ' + parseInt(page) * 100 + ', 100;';
+    var selectSql = 'SELECT * FROM panda ORDER BY id desc limit ' + parseInt(page) * 100 + ', 100;';
     conn.query(selectSql, function (err, rows, fields) {
         if (err) {
             return console.log(err)
@@ -71,7 +71,7 @@ function selectAndSend() {
         }
         var options = {
             headers: {"Connection": "close"},
-            url: 'http://121.42.136.52:2999/bilibli',
+            url: 'http://120.27.94.166:2999/panda',
             method: 'POST',
             json: true,
             body: {data: rows}
